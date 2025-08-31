@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Custom Clock New Tab</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <div id="background"></div>
+    <div id="clock"></div>
+
+    <!-- Gear Icon for Settings -->
+    <div id="gear">
+      <svg width="32" height="32" viewBox="0 0 24 24">
+        <path
+          fill="#fff"
+          d="M12 15.5A3.49 3.49 0 1 1 15.5 12A3.48 3.48 0 0 1 12 15.5ZM19.43 12.98c.04-.32.07-.65.07-.98s-.03-.66-.07-.98l2.11-1.65a.5.5 0 0 0 .12-.64l-2-3.46a.5.5 0 0 0-.6-.22l-2.49 1a7.08 7.08 0 0 0-1.69-.98l-.38-2.65A.5.5 0 0 0 12 2h-4a.5.5 0 0 0-.5.41l-.38 2.65a7.08 7.08 0 0 0-1.69.98l-2.49-1a.5.5 0 0 0-.6.22l-2 3.46a.5.5 0 0 0 .12.64l2.11 1.65c-.04.32-.07.65-.07.98s.03.66.07.98L2.57 14.63a.5.5 0 0 0-.12.64l2 3.46c.14.24.44.32.67.22l2.49-1a7.08 7.08 0 0 0 1.69.98l.38 2.65A.5.5 0 0 0 8 22h4a.5.5 0 0 0 .5-.41l.38-2.65a7.08 7.08 0 0 0 1.69-.98l2.49 1c.23.1.53.02.67-.22l2-3.46a.5.5 0 0 0-.12-.64ZM12 17a5 5 0 1 1 5-5a5 5 0 0 1-5 5Z"
+        />
+      </svg>
+    </div>
+
+    <!-- Settings Modal -->
+    <div id="settingsModal" class="modal">
+      <div class="modal-content">
+        <span id="closeSettings">&times;</span>
+        <h2>Customize</h2>
+        <label>Background Upload:</label>
+        <input type="file" id="bgUpload" accept="image/*" />
+        <label>Background URL:</label>
+        <input type="text" id="bgUrl" placeholder="Enter image URL" />
+        <label>Font:</label>
+        <select id="fontFamily">
+          <option value="Arial">Arial</option>
+          <option value="Courier New">Courier New</option>
+          <option value="Georgia">Georgia</option>
+          <option value="Times New Roman">Times New Roman</option>
+          <option value="Verdana">Verdana</option>
+        </select>
+        <label>Font Size (px):</label>
+        <input type="number" id="fontSize" min="10" max="200" value="48" />
+        <label>Font Color:</label>
+        <input type="color" id="fontColor" value="#ffffff" />
+        <button id="saveBtn">Save Settings</button>
+      </div>
+    </div>
+
+    <script src="newtab.js"></script>
+  </body>
+</html>
