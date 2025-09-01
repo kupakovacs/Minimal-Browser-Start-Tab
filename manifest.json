@@ -1,8 +1,8 @@
 {
   "manifest_version": 3,
-  "name": "Min",
+  "name": "Random Image New Tab",
   "version": "1.0",
-  "description": "A customiseable start page for your browser.",
+  "description": "A suprisingly good looking new tab extension that pulls a random image from Wikipedia (any language).",
   "chrome_url_overrides": {
     "newtab": "newtab.html"
   },
