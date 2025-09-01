@@ -1,5 +1,5 @@
 {
-  "manifest_version": 3,
+  "manifest_version": 2,
   "name": "Random Image New Tab",
   "version": "1.0",
   "description": "A surprisingly good-looking new tab extension that pulls a random image from Wikipedia (any language).",
@@ -13,7 +13,7 @@
   "browser_specific_settings": {
     "gecko": {
       "id": "random-image-newtab@example.com",
-      "strict_min_version": "58.0"
+      "strict_min_version": "57.0"
     }
   }
 }

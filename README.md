@@ -1,3 +1,5 @@
-# COMPLETELY RANDOM Wikipedia Image New TAb
+# RandTab
 
-Want a great relaxing experience for your new tab, and also want to learn something new each day? This extension is for you.
+### Random stunning images for your new tab
+
+Transform your new tab into a daily source of inspiration. WanderTab displays a random high-quality image every time you open a new tab, creating a fresh, beautiful backdrop. Images are pulled from a wide variety of sources, offering a subtle touch of global knowledge and artistry without cluttering your experience.
