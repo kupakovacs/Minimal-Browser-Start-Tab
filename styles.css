@@ -1,8 +1,32 @@
+/* Loader spinner styles */
+#loader {
+  position: absolute;
+  top: calc(10% + 330px); /* below main-info */
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 1;
+}
+#loader-img {
+  position: sticky;
+
+  width: 80px;
+  height: 80px;
+  animation: spin 1s linear infinite;
+}
+@keyframes spin {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+@import url("https://fonts.cdnfonts.com/css/satoshi");
 body {
   margin: 0;
   padding: 0;
   overflow: hidden;
-  font-family: Arial, sans-serif;
+  font-family: "Satoshi", sans-serif;
 }
 
 #background {
@@ -11,30 +35,54 @@ body {
   left: 0;
   width: 100%;
   height: 100%;
-  z-index: -1;
+  z-index: 0;
   background: #000;
 }
 
-#clock {
+.main-info {
   padding-top: 50px;
   position: absolute;
   top: 10%;
   left: 50%;
   transform: translate(-50%, -50%);
-  color: white;
-  font-size: 100px;
-  font-weight: bold;
+  align-items: center;
+  display: flex;
+  flex-direction: column;
+}
+.divider {
+  width: 100%;
+  height: 3px;
+  background-color: rgba(255, 255, 255);
+  box-shadow: 1px 1px 4px rgba(0, 0, 0, 0.7);
+  margin-top: -20px;
+  border-radius: 4px;
+}
+#fancy-date {
+  color: #ffffff;
+  font-weight: 400;
+  margin-top: 0px;
+  font-size: 32px;
   text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.5);
 }
+#clock {
+  color: #ffffff;
+  font-weight: 800;
+  font-size: 130px;
+  text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.5);
+  padding: 0;
+  margin: 0;
+}
 #article-info {
+  color: white;
+  font-size: 24px;
+  font-weight: bold;
+  text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.7);
+  text-decoration: none;
+}
+.info-container {
   position: absolute;
   font-style: italic;
   bottom: 0.5%;
   left: 50%;
   transform: translate(-50%, -50%);
-  color: white;
-  font-size: 24px;
-  font-weight: bold;
-  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
-  text-decoration: none;
 }
