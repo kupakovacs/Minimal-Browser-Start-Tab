@@ -1,143 +1,111 @@
-function updateClock() {
-  const now = new Date();
-  const hours = now.getHours().toString().padStart(2, "0");
-  const minutes = now.getMinutes().toString().padStart(2, "0");
-  const seconds = now.getSeconds().toString().padStart(2, "0");
-  document.getElementById(
-    "clock"
-  ).textContent = `${hours}:${minutes}:${seconds}`;
-}
+async function setRandomWikiBackground() {
+  try {
+    // Show loading state
+    const bg = document.getElementById("background");
+    bg.style.background = "linear-gradient(135deg, #1e3c72, #2a5298)";
 
-function applySettings(settings) {
-  const background = document.getElementById("background");
-  const clock = document.getElementById("clock");
-  if (settings.backgroundData) {
-    background.style.backgroundImage = `url(${settings.backgroundData})`;
-  } else if (settings.backgroundUrl) {
-    background.style.backgroundImage = `url(${settings.backgroundUrl})`;
-  } else {
-    background.style.backgroundImage = "";
-  }
-  clock.style.fontFamily = settings.fontFamily || "Arial";
-  clock.style.fontSize = (settings.fontSize || 48) + "px";
-  clock.style.color = settings.fontColor || "#ffffff";
-  // Set clock position if provided
-  clock.style.left = settings.clockX || "100px";
-  clock.style.top = settings.clockY || "100px";
-  // Controls values
-  document.getElementById("bgUrl").value = settings.backgroundUrl || "";
-  document.getElementById("fontFamily").value = settings.fontFamily || "Arial";
-  document.getElementById("fontSize").value = settings.fontSize || 48;
-  document.getElementById("fontColor").value = settings.fontColor || "#ffffff";
-}
+    // Add timeout to prevent hanging
+    const timeoutPromise = new Promise((_, reject) =>
+      setTimeout(() => reject(new Error("Timeout")), 10000)
+    );
 
-function saveSettings() {
-  const settings = {
-    backgroundUrl: document.getElementById("bgUrl").value.trim(),
-    fontFamily: document.getElementById("fontFamily").value,
-    fontSize: parseInt(document.getElementById("fontSize").value, 10),
-    fontColor: document.getElementById("fontColor").value,
-  };
-  chrome.storage.sync.get(["backgroundData", "clockX", "clockY"], (prev) => {
-    settings.backgroundData = prev.backgroundData || "";
-    settings.clockX = prev.clockX || "100px";
-    settings.clockY = prev.clockY || "100px";
-    chrome.storage.sync.set(settings, () => {
-      applySettings(settings);
-    });
-  });
-}
+    const loadImagePromise = async () => {
+      // 1. Get a random page title using Wikipedia API (CORS-friendly)
+      const randomApiUrl = `https://en.wikipedia.org/w/api.php?action=query&list=random&rnnamespace=0&rnlimit=1&format=json&origin=*`;
+      const randomResponse = await fetch(randomApiUrl);
+      const randomData = await randomResponse.json();
+      const title = randomData.query.random[0].title;
+      document.getElementById("article-info").textContent = title;
+      document.getElementById(
+        "article-info"
+      ).href = `https://en.wikipedia.org/wiki/${encodeURIComponent(title)}`;
 
-function loadSettings() {
-  chrome.storage.sync.get(
-    [
-      "backgroundUrl",
-      "backgroundData",
-      "fontFamily",
-      "fontSize",
-      "fontColor",
-      "clockX",
-      "clockY",
-    ],
-    (settings) => {
-      applySettings(settings);
-    }
-  );
-}
+      // 2. Get images from that page
+      const apiUrl = `https://en.wikipedia.org/w/api.php?action=query&titles=${encodeURIComponent(
+        title
+      )}&prop=images&format=json&origin=*`;
+      const response = await fetch(apiUrl);
+      const data = await response.json();
 
-// Settings modal logic
-document.getElementById("gear").onclick = () => {
-  document.getElementById("settingsModal").style.display = "block";
-};
-document.getElementById("closeSettings").onclick = () => {
-  document.getElementById("settingsModal").style.display = "none";
-};
-window.onclick = (e) => {
-  if (e.target === document.getElementById("settingsModal")) {
-    document.getElementById("settingsModal").style.display = "none";
-  }
-};
+      const pages = data.query.pages;
+      let images = [];
 
-// Background upload
-document.getElementById("bgUpload").onchange = function (e) {
-  const file = e.target.files[0];
-  if (!file) return;
-  const reader = new FileReader();
-  reader.onload = function (ev) {
-    const dataURL = ev.target.result;
-    chrome.storage.sync.set({ backgroundData: dataURL }, () => {
-      // Save existing settings also to update
-      chrome.storage.sync.get(
-        [
-          "backgroundUrl",
-          "fontFamily",
-          "fontSize",
-          "fontColor",
-          "clockX",
-          "clockY",
-        ],
-        (prev) => {
-          applySettings(Object.assign(prev, { backgroundData: dataURL }));
+      for (const pageId in pages) {
+        const page = pages[pageId];
+        if (page.images) {
+          for (const img of page.images) {
+            if (/\.(jpg|jpeg|png)$/i.test(img.title)) {
+              images.push(img.title);
+            }
+          }
         }
-      );
-    });
-  };
-  reader.readAsDataURL(file);
-};
+      }
 
-// Clock dragging logic (50px grid snap)
-let drag = false,
-  offset = { x: 0, y: 0 };
+      if (images.length === 0) {
+        console.log("No images found, retrying...");
+        setRandomWikiBackground();
+        return;
+      }
 
-const clock = document.getElementById("clock");
-clock.onmousedown = function (e) {
-  drag = true;
-  offset.x = e.clientX - clock.offsetLeft;
-  offset.y = e.clientY - clock.offsetTop;
-};
-document.onmousemove = function (e) {
-  if (!drag) return;
-  let x = Math.round((e.clientX - offset.x) / 50) * 50;
-  let y = Math.round((e.clientY - offset.y) / 50) * 50;
-  clock.style.left = x + "px";
-  clock.style.top = y + "px";
-};
-document.onmouseup = function (e) {
-  if (drag) {
-    drag = false;
-    // Save position to storage
-    chrome.storage.sync.set({
-      clockX: clock.style.left,
-      clockY: clock.style.top,
-    });
+      // 3. Pick a random image
+      const randomImageTitle =
+        images[Math.floor(Math.random() * images.length)];
+
+      // 4. Get direct image URL
+      const imageInfoUrl = `https://en.wikipedia.org/w/api.php?action=query&titles=${encodeURIComponent(
+        randomImageTitle
+      )}&prop=imageinfo&iiprop=url&format=json&origin=*`;
+      const imageInfoResponse = await fetch(imageInfoUrl);
+      const imageInfoData = await imageInfoResponse.json();
+
+      let imageUrl = null;
+      for (const pageId in imageInfoData.query.pages) {
+        const imgInfo = imageInfoData.query.pages[pageId].imageinfo;
+        if (imgInfo && imgInfo.length > 0) {
+          imageUrl = imgInfo[0].url;
+          break;
+        }
+      }
+
+      if (imageUrl) {
+        // Preload the image to ensure smooth transition
+        const img = new Image();
+        img.onload = () => {
+          bg.style.backgroundImage = `url('${imageUrl}')`;
+          bg.style.backgroundSize = "cover";
+          bg.style.backgroundPosition = "center";
+        };
+        img.src = imageUrl;
+      }
+    };
+
+    await Promise.race([loadImagePromise(), timeoutPromise]);
+  } catch (error) {
+    console.error("Error fetching Wikipedia image:", error);
+    // Fallback to a nice gradient if loading fails
+    const bg = document.getElementById("background");
+    bg.style.background = "linear-gradient(135deg, #667eea, #764ba2)";
   }
-};
+}
 
-// Initial clock and load settings
-updateClock();
-setInterval(updateClock, 1000);
+async function getTime() {
+  const now = new Date();
+  const formattedTime = now.toLocaleTimeString([], {
+    hour: "2-digit",
+    minute: "2-digit",
+    hour12: false,
+  });
+  return formattedTime;
+}
 
-window.onload = () => {
-  loadSettings();
-  document.getElementById("saveBtn").addEventListener("click", saveSettings);
-};
+async function updateTime() {
+  const formattedTime = await getTime();
+  document.getElementById("clock").textContent = formattedTime;
+
+  setInterval(async () => {
+    const newTime = await getTime();
+    document.getElementById("clock").textContent = newTime;
+  }, 1000);
+}
+updateTime();
+setRandomWikiBackground();
